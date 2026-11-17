@@ -60,3 +60,91 @@ automáticamente (recolector de basura).
 
 Conclusión: en una lista enlazada, cada flecha es el único camino hacia lo que
 viene después. Perder un enlace significa perder todo lo que estaba detrás.
+
+MINIRETO2 SEMANA2--------------------------------------------------
+## Referencias que cambian al agregar
+
+En todos los casos `tamanio` aumenta en 1.
+
+### 1. Lista vacía: agregarAlFinal(A) y agregarAlInicio(A)
+
+Es igual en ambos métodos: el nodo nuevo es a la vez el primero y el último.
+
+```
+Antes:   cabeza → null     cola → null
+Después: cabeza → [A | null]
+         cola   → [A | null]     (misma caja)
+```
+
+Cambian: `cabeza` y `cola`.
+
+### 2. Lista con un nodo [A]: agregarAlInicio(B)
+
+```
+Antes:   cabeza → [A | null]
+         cola   → [A | null]
+
+Después: cabeza → [B | ──→ [A | null]
+                              ↑ cola (no cambió)
+```
+
+1. `nuevo.siguiente = cabeza` (B apunta a A)
+2. `cabeza = nuevo`
+
+Cambian: `nuevo.siguiente` y `cabeza`. No cambia: `cola`.
+
+### 3. Lista con un nodo [A]: agregarAlFinal(B)
+
+```
+Antes:   cabeza → [A | null]
+         cola   → [A | null]
+
+Después: cabeza → [A | ──→ [B | null]
+                              ↑ cola
+```
+
+1. `cola.siguiente = nuevo` (A apunta a B)
+2. `cola = nuevo`
+
+Cambian: `A.siguiente` y `cola`. No cambia: `cabeza`.
+
+### 4. Lista con varios nodos [A, B, C]: agregarAlInicio(X)
+
+```
+Antes:   cabeza → [A] → [B] → [C | null]
+                                ↑ cola
+
+Después: cabeza → [X] → [A] → [B] → [C | null]
+                                      ↑ cola (no cambió)
+```
+
+Cambian: `X.siguiente` y `cabeza`. Los nodos A, B y C no se tocan.
+
+### 5. Lista con varios nodos [A, B, C]: agregarAlFinal(X)
+
+```
+Antes:   cabeza → [A] → [B] → [C | null]
+                                ↑ cola
+
+Después: cabeza → [A] → [B] → [C] → [X | null]
+                                      ↑ cola
+```
+
+Cambian: `C.siguiente` y `cola`. No cambia: `cabeza`.
+
+### Por qué son O(1)
+
+Ninguna recorre la lista. Gracias a `cabeza` y `cola` se llega directo
+al primero y al último, y siempre se modifican las mismas 2 referencias,
+sin importar cuántos nodos haya.
+
+### Resumen
+
+| Caso                  | Cambia cabeza | Cambia cola | tamanio |
+|-----------------------|---------------|-------------|---------|
+| Vacía, al inicio/final| sí            | sí          | 0 → 1   |
+| 1 nodo, al inicio     | sí            | no          | 1 → 2   |
+| 1 nodo, al final      | no            | sí          | 1 → 2   |
+| Varios, al inicio     | sí            | no          | n → n+1 |
+| Varios, al final      | no            | sí          | n → n+1 |
+
