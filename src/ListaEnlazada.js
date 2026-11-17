@@ -48,6 +48,59 @@ class ListaEnlazada {
     obtenerTamanio() {
         return this.tamanio;
     }
+
+    /*Implementa buscar(condicion), que devuelva el primer dato que cumple una función de condición, o null si no existe.*/
+
+    buscar(condicion) {
+        let actual = this.cabeza;
+        while(actual) {
+            if(condicion(actual.dato)) return actual.dato
+            else actual = actual.siguiente
+        }
+        return null
+    }
+
+    insertarDespuesDe(condicion, dato){
+        if(this.estaVacia) return null;
+        const nuevo = new Nodo(dato);
+        let actual = this.cabeza;
+        while(actual){
+            if(condicion(actual.dato)){
+            nuevo.siguiente = actual.siguiente;
+            actual.siguiente = nuevo;
+            if(this.cola == actual) this.cola = nuevo;
+            this.tamanio++
+            return true
+            } else actual = actual.siguiente;
+        }
+        return false;
+    }
+
+    eliminar(condicion){
+        let actual = this.cabeza;
+        if(!actual) return null
+
+        if(condicion(actual.dato)){
+            const dato = actual.dato;
+            actual = actual.siguiente;
+            if(!actual) this.cola = null
+            this.tamanio--
+            return dato
+        }
+
+        while(actual.siguiente){
+            if(condicion(actual.siguiente.dato)){
+            const dato = actual.siguiente.dato;
+            actual.siguiente = actual.siguiente.siguiente;
+            if(!actual.siguiente) this.cola = actual
+            this.tamanio--
+            return dato;
+            }
+            actual = actual.siguiente;
+        }
+        return null;
+    }
+    
 }
 
 module.exports = { ListaEnlazada }

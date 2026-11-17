@@ -148,3 +148,138 @@ sin importar cuántos nodos haya.
 | Varios, al inicio     | sí            | no          | n → n+1 |
 | Varios, al final      | no            | sí          | n → n+1 |
 
+MINIRETO3 SEMANA2 -------------------------------------------------------------
+## Eliminar: los tres casos
+
+Lista de partida en los tres casos:
+
+```
+cabeza → [A] → [B] → [C | null]
+                        ↑ cola
+```
+
+En todos los casos, si se elimina un nodo, `tamanio` baja en 1 y el método
+devuelve el dato del nodo eliminado. Si ninguno cumple la condición, no
+cambia nada y devuelve `null`.
+
+### 1. Eliminar la cabeza (A)
+
+La cabeza no tiene nodo anterior, así que se mueve el post-it `cabeza`
+al siguiente nodo.
+
+```
+Antes:   cabeza → [A] → [B] → [C | null]
+                                ↑ cola
+
+Paso:    cabeza = cabeza.siguiente
+
+Después:          [A]   (suelto, nadie le apunta)
+         cabeza → [B] → [C | null]
+                          ↑ cola (no cambió)
+```
+
+Cambia: `cabeza`. No cambia: `cola`.
+
+Caso especial: si la lista tenía **un solo nodo**, `cabeza` queda en `null`
+y entonces también hay que poner `cola = null`.
+
+```
+Antes:   cabeza → [A | null]    cola → [A | null]
+Después: cabeza → null          cola → null
+```
+
+### 2. Eliminar un nodo intermedio (B)
+
+Se necesita el nodo **anterior** (A), porque es A quien debe saltarse a B.
+
+```
+Antes:   cabeza → [A] → [B] → [C | null]
+                  ↑ anterior   ↑ cola
+
+Paso:    anterior.siguiente = anterior.siguiente.siguiente
+         (A, en vez de apuntar a B, apunta a C)
+
+Después:                [B]   (suelto, nadie le apunta)
+         cabeza → [A] ────────→ [C | null]
+                                  ↑ cola (no cambió)
+```
+
+Cambia: `A.siguiente`. No cambian: `cabeza` ni `cola`.
+
+### 3. Eliminar la cola (C)
+
+También se necesita el nodo anterior (B). Como B pasa a ser el último,
+hay que mover `cola`.
+
+```
+Antes:   cabeza → [A] → [B] → [C | null]
+                         ↑ anterior ↑ cola
+
+Paso 1:  anterior.siguiente = anterior.siguiente.siguiente
+         (B apunta a null, que era el siguiente de C)
+Paso 2:  cola = anterior
+
+Después: cabeza → [A] → [B | null]       [C] (suelto)
+                          ↑ cola
+```
+
+Cambian: `B.siguiente` y `cola`. No cambia: `cabeza`.
+
+### Resumen
+
+| Caso               | Cambia cabeza | Cambia cola | Otro enlace cambiado |
+|--------------------|---------------|-------------|----------------------|
+| Cabeza (varios)    | sí            | no          | ninguno              |
+| Cabeza (1 nodo)    | sí (→ null)   | sí (→ null) | ninguno              |
+| Intermedio         | no            | no          | anterior.siguiente   |
+| Cola               | no            | sí          | anterior.siguiente   |
+
+### Por qué hay que recorrer
+
+Eliminar la cabeza es O(1), pero eliminar un intermedio o la cola requiere
+**recorrer** la lista para encontrar al nodo anterior. La lista solo tiene
+flechas hacia adelante, así que desde un nodo no se puede "retroceder".
+
+## Complejidad de las operaciones
+
+n = cantidad de nodos de la lista.
+
+| Operación                      | Complejidad | Por qué                                                                 |
+|--------------------------------|-------------|-------------------------------------------------------------------------|
+| Eliminar en una lista vacía    | O(1)        | `cabeza` es `null`: no hay nada que buscar, retorna `null` de inmediato. |
+| Eliminar el único nodo         | O(1)        | La `cabeza` cumple la condición; solo se ajustan `cabeza` y `cola`.      |
+| Eliminar la cabeza             | O(1)        | Se llega directo con `cabeza`; solo se mueve `cabeza = cabeza.siguiente`.|
+| Eliminar la cola               | O(n)        | Hay que recorrer la lista para encontrar el nodo anterior (ver abajo).   |
+| Eliminar algo que no existe    | O(n)        | Se recorre toda la lista y al final no se encuentra nada.                |
+| Insertar después de la cola    | O(n) o O(1) | Con `insertarDespuesDe(condicion, dato)` es O(n), porque recorre la lista buscando el nodo que cumple. Si ya se sabe que es la cola, se usa `agregarAlFinal`, que es O(1) gracias a `cola`. |
+
+## ¿Por qué eliminar la cola requiere recorrer la lista?
+
+Tener la referencia `cola` permite llegar al último nodo directamente, pero
+**no sirve para eliminarlo**. Para quitar la cola hay que hacer dos cosas:
+
+1. Que el nodo anterior pase a apuntar a `null` (`anterior.siguiente = null`).
+2. Que `cola` pase a apuntar a ese nodo anterior (`cola = anterior`).
+
+El problema es que en una lista simplemente enlazada cada nodo solo tiene
+una flecha hacia adelante (`siguiente`). Desde la cola no se puede
+retroceder, no hay forma de preguntarle "¿quién está antes de ti?".
+
+```
+cabeza → [A] → [B] → [C | null]
+                        ↑ cola      (C no sabe que B lo apunta)
+```
+
+La única manera de encontrar a B es empezar desde `cabeza` y avanzar de
+`siguiente` en `siguiente` hasta llegar al nodo cuyo `siguiente` sea la
+`cola`. Eso recorre casi toda la lista, así que cuesta O(n).
+
+Una vez B apunta a `null` y `cola = B`, nadie referencia al nodo C. Queda
+inalcanzable y JavaScript lo libera de la memoria solo.
+
+Esto contrasta con eliminar la cabeza, que es O(1): la cabeza no necesita
+nodo anterior, solo se mueve `cabeza` al siguiente.
+
+Nota: en una lista **doblemente enlazada** (cada nodo con `anterior` y
+`siguiente`), eliminar la cola sí sería O(1), porque `cola.anterior`
+da el nodo previo directamente.

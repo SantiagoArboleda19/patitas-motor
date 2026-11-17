@@ -43,6 +43,22 @@ lista.agregarAlFinal(nodo3.dato);
 //console.log(lista.mostrarNodo(nodo1.dato));
 //console.log(lista.mostrarNodo(nodo2.dato));
 //console.log(lista.mostrarNodo(nodo3.dato));
-lista.recorrer((dato) => console.log(dato));
-console.log(lista.aArreglo());
+//console.log(lista.aArreglo());
 //console.log(lista2.estaVacia());
+//console.log(lista.buscar(dato => dato.costo == 40000))
+
+
+console.log("============");
+lista.recorrer((dato) => console.log(dato));
+console.log("============");
+//lista.insertarDespuesDe(dato => dato.costo == 40000, nodo2.dato);
+//lista.recorrer((dato) => console.log(dato));
+console.log("============");
+lista.insertarDespuesDe((dato) => dato.costo == 150000, nodo2.dato);
+lista.recorrer((dato) => console.log(dato));
+console.log("============");
+//console.log(lista.cola);
+lista.eliminar((dato) => dato.costo == 85000);
+lista.recorrer((dato) => console.log(dato));
+
+
