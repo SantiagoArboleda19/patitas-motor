@@ -49,7 +49,7 @@ class ListaEnlazada {
         return this.tamanio;
     }
 
-    /*Implementa buscar(condicion), que devuelva el primer dato que cumple una función de condición, o null si no existe.*/
+    /*Agrega al reporte la última vacunación de cada mascota (o “sin registro”) usando buscar.*/
 
     buscar(condicion) {
         let actual = this.cabeza;

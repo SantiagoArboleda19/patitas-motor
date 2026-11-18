@@ -1,5 +1,5 @@
 # Bitácora
-MINIRETO1 SEMANA1--------------------------------------------------
+MINIRETO1 SEMANA2-----------------------------------------------------------
 ## Diagrama de nodos y flechas
 
 Los tres nodos de Lola, enlazados en orden cronológico:
@@ -283,3 +283,27 @@ nodo anterior, solo se mueve `cabeza` al siguiente.
 Nota: en una lista **doblemente enlazada** (cada nodo con `anterior` y
 `siguiente`), eliminar la cola sí sería O(1), porque `cola.anterior`
 da el nodo previo directamente.
+
+MINIRETO4 SEMANA2--------------------------------------------------------------------------
+## ListaEnlazada vs. arreglo
+
+n = cantidad de elementos. Se asume que la lista tiene `cabeza` y `cola`.
+
+| Operación                        | ListaEnlazada | Arreglo | Por qué                                                                 |
+|----------------------------------|---------------|---------|-------------------------------------------------------------------------|
+| Agregar al final                 | O(1)          | O(1)*   | Lista: se llega directo con `cola`. Arreglo: `push` (*amortizado).      |
+| Agregar al inicio                | O(1)          | O(n)    | Lista: solo cambian `nuevo.siguiente` y `cabeza`. Arreglo: `unshift` corre todos los elementos una posición. |
+| Acceder a la atención número k   | O(k) ≈ O(n)   | O(1)    | Lista: hay que avanzar k veces desde `cabeza`. Arreglo: `arreglo[k]` salta directo a la posición. |
+| Buscar (por condición)           | O(n)          | O(n)    | En ambos hay que revisar elemento por elemento hasta encontrarlo.       |
+| Eliminar la primera              | O(1)          | O(n)    | Lista: `cabeza = cabeza.siguiente`. Arreglo: `shift` corre todos los elementos una posición a la izquierda. |
+
+\* `push` es O(1) amortizado: casi siempre es directo, y de vez en cuando el arreglo
+debe crecer y copiarse, pero en promedio el costo por operación sigue siendo constante.
+
+### Conclusión
+
+- La lista enlazada gana cuando se agrega o elimina en los **extremos** (sobre todo al inicio),
+  porque solo cambia un par de referencias y no hay que mover nada.
+- El arreglo gana cuando se necesita **acceso por posición**, porque la posición
+  se calcula directamente.
+- Buscar cuesta lo mismo en ambos: O(n).
