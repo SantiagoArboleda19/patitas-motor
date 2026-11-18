@@ -307,3 +307,106 @@ debe crecer y copiarse, pero en promedio el costo por operación sigue siendo co
 - El arreglo gana cuando se necesita **acceso por posición**, porque la posición
   se calcula directamente.
 - Buscar cuesta lo mismo en ambos: O(n).
+
+MINIRETO5 SEMANA2-------------------------------------------------------------------------------
+## Cola: estado después de encolar y desencolar
+
+`frente` apunta al próximo en salir y `final` al último que entró.
+Cada nodo apunta (`siguiente`) al que entró después de él.
+
+### 1. Cola vacía
+
+```
+frente → null
+final  → null
+cantidad = 0
+```
+
+### 2. encolar("Lola")
+
+Cola vacía: el nodo nuevo es a la vez el frente y el final.
+
+```
+frente → [Lola | null]
+final  → [Lola | null]     (misma caja)
+cantidad = 1
+```
+
+### 3. encolar("Toby")
+
+`final.siguiente = nuevo` y luego `final = nuevo`.
+
+```
+frente → [Lola | ──→ [Toby | null]
+                        ↑ final
+cantidad = 2
+```
+
+### 4. encolar("Mía")
+
+```
+frente → [Lola | ──→ [Toby | ──→ [Mía | null]
+                                    ↑ final
+cantidad = 3
+```
+
+### 5. desencolar() una vez
+
+Sale el que está al frente (Lola). Se guarda su dato y se hace
+`frente = frente.siguiente`. El `final` no cambia.
+
+```
+          [Lola]   (suelto, nadie le apunta; devuelve "Lola")
+
+frente → [Toby | ──→ [Mía | null]
+                       ↑ final (no cambió)
+cantidad = 2
+```
+
+### Resumen de referencias
+
+| Operación        | Cambia frente | Cambia final | cantidad |
+|------------------|---------------|--------------|----------|
+| encolar (vacía)  | sí            | sí           | 0 → 1    |
+| encolar (con nodos) | no         | sí           | n → n+1  |
+| desencolar (varios) | sí         | no           | n → n-1  |
+| desencolar (queda vacía) | sí (→ null) | sí (→ null) | 1 → 0 |
+
+Orden de salida: Lola, Toby, Mía (el primero en entrar es el primero en salir, FIFO).
+Ambas operaciones son O(1): no recorren la cola.
+
+## Cola vs. arreglo (`push` / `shift`) con 100.000 turnos
+
+### Tiempos medidos
+
+| Operación (100.000 turnos)         | Cola (nodos) | Arreglo       |
+|------------------------------------|--------------|---------------|
+| Encolar (`encolar` / `push`)       | 3.924 ms     | 7.63 ms       |
+| Desencolar (`desencolar` / `shift`)| 0.018 ms     | 12.398 s      |
+
+`shift` tardó alrededor de **12,4 segundos**, miles de veces más que cualquier
+otra operación. Los tiempos pueden variar entre ejecuciones y equipos.
+
+### Complejidad
+
+| Operación | Cola (nodos) | Arreglo | Por qué |
+|-----------|--------------|---------|---------|
+| Encolar   | O(1)         | O(1)*   | Cola: `final.siguiente = nuevo` y se mueve `final`, sin recorrer. Arreglo: `push` agrega en la última posición (*amortizado). |
+| Desencolar| O(1)         | O(n)    | Cola: `frente = frente.siguiente`. Arreglo: `shift` debe correr todos los elementos una posición a la izquierda para tapar el hueco. |
+
+Para N turnos, N desencolados cuestan:
+- Cola: N × O(1) = **O(N)**
+- Arreglo: N × O(n) = **O(N²)**
+
+### Explicación de la diferencia
+
+- **Encolar es parecido en ambas** (milisegundos). Las dos agregan al final sin mover nada. El `push` salió algo más lento por el trabajo de crecer el arreglo cuando se llena.
+- **Desencolar es donde se separan.** En la cola, sacar el frente solo cambia una
+  referencia (`frente`), sin importar cuántos turnos haya. En el arreglo, cada
+  `shift` desplaza los elementos restantes, así que con 100.000 turnos el costo
+  se acumula: unos 100.000 desplazamientos en el primer `shift`, 99.999 en el
+  segundo, y así. Eso es lo que explica los 12 segundos.
+- **Conclusión:** para una cola FIFO (el primero en entrar es el primero en
+  salir), la lista enlazada con `frente` y `final` es la estructura adecuada,
+  porque ambos extremos se manejan en O(1). El arreglo con `shift` solo sirve
+  para colas pequeñas.
